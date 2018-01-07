@@ -1,0 +1,22 @@
+.gradle
+bin/
+build/
+out/
+.classpath
+
+# IntelliJ
+.idea
+*.iml
+
+# eclipse
+.project
+
+# MAC OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
