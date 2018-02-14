@@ -13,9 +13,13 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Info
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
 import javax.transaction.Transactional
 import javax.validation.constraints.NotNull
 import javax.ws.rs.*
+import javax.ws.rs.container.AsyncResponse
+import javax.ws.rs.container.Suspended
 import javax.ws.rs.core.MediaType
 
 @Path("/accounts")
@@ -29,9 +33,10 @@ class AccountApi @Autowired constructor(
 
     @GET
     @Transactional
-    fun getAccounts(): List<AccountDTO> {
+    fun getAccounts(): CompletionStage<List<AccountDTO>> {
 //        accountRepository.findAll().forEach { System.err.println(it.credentials[0].type) }
-        return accountRepository.findAll().map { it.assembleDto() }
+        return CompletableFuture.supplyAsync { accountRepository.findAll().map { it.assembleDto() } }
+
     }
 
     @POST
@@ -40,7 +45,7 @@ class AccountApi @Autowired constructor(
     fun createAccount(
             @NotNull
             //            @Valid
-            accountDTO: AccountDTO?
+            accountDTO: AccountDTO
     ): AccountDTO? {
         val account = Account(
                 displayName = "")
@@ -48,8 +53,8 @@ class AccountApi @Autowired constructor(
 //        PasswordService.hash("")
         val credential: Credential = CredentialPassword(
                 account = account,
-                email = accountDTO!!.email!!,
-                password = passwordService.hash(accountDTO!!.password!!))
+                email = accountDTO.email!!,
+                password = passwordService.hash(accountDTO.password!!))
 
         account.credentials.add(credential)
 
