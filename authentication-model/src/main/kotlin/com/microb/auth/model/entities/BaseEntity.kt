@@ -15,7 +15,7 @@ abstract class BaseEntity {
     var id = UUID.randomUUID()
         private set
 
-    override final fun equals(other: Any?): Boolean {
+    final override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is BaseEntity) return false
 
@@ -24,7 +24,7 @@ abstract class BaseEntity {
         return true
     }
 
-    override final fun hashCode(): Int {
+    final override fun hashCode(): Int {
         return id?.hashCode() ?: 0
     }
 
