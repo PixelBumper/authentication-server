@@ -23,8 +23,7 @@ abstract class Credential(
 
 
     enum class CredentialType(val discriminator: String) {
-        UNKNOWN("UNKNOWN"),
-        PASSWORD(discriminator = CredentialType.PASSWORD_DISCRIMINATOR),
+        PASSWORD(CredentialType.PASSWORD_DISCRIMINATOR),
         IOS_VENDOR_ID(CredentialType.IOS_VENDOR_ID_DISCRIMINATOR);
 
         companion object {
