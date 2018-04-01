@@ -7,15 +7,13 @@ import javax.persistence.OneToMany
 
 @Entity
 class Account(
-        var displayName: String,
-
         @OneToMany(
                 mappedBy = "account",
-                cascade = arrayOf(CascadeType.ALL),
+                cascade = [CascadeType.ALL],
                 targetEntity = Credential::class)
         var credentials: MutableList<Credential> = mutableListOf()
 ) : BaseEntity(), Principal {
 
-    override fun getName(): String = "$id ($displayName)"
+    override fun getName(): String = "$id"
 }
 
