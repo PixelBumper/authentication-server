@@ -2,8 +2,8 @@ buildscript {
     ext {
         sourceCompatibilityVersion = '1.8'
         kotlinVersion = '1.2.21'
-        springBootVersion = '2.0.0.RC1'
-        swaggerVersion = '2.0.0-rc2'
+        springBootVersion = '2.0.0.RELEASE'
+        swaggerVersion = '2.0.0'
     }
     repositories {
         mavenCentral()

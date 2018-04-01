@@ -39,9 +39,10 @@ dependencies {
     //spring
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-jersey')
+    compile('org.springframework.boot:spring-boot-starter-security')
 
     // swagger
-    compile 'io.swagger.core.v3:swagger-jaxrs2:2.0.0-rc3'
+    compile "io.swagger.core.v3:swagger-jaxrs2:$swaggerVersion"
 
     // hashing libraries
     compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4'

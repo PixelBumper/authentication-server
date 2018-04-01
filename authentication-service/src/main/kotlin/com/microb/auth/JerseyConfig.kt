@@ -3,12 +3,7 @@ package com.microb.auth
 import com.microb.auth.jersey.api.AccountApi
 import com.microb.auth.jersey.mappers.AllExceptionMapper
 import com.microb.auth.jersey.mappers.WebApplicationExceptionMapper
-import io.swagger.v3.jaxrs2.SwaggerSerializers
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.info.Info
-import io.swagger.v3.oas.models.info.License
-import io.swagger.v3.oas.models.servers.Server
 import org.glassfish.jersey.jackson.JacksonFeature
 import org.glassfish.jersey.server.ResourceConfig
 import org.glassfish.jersey.server.ServerProperties
