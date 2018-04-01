@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import javax.transaction.Transactional
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 import javax.ws.rs.*
 import javax.ws.rs.container.AsyncResponse
@@ -40,21 +41,25 @@ class AccountApi @Autowired constructor(
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("create-account-for-email-and-password")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Transactional
-    fun createAccount(
-            @NotNull
-            //            @Valid
-            accountDTO: AccountDTO
+    fun createEmailAccount(
+            @NotBlank
+            @FormParam("email")
+            email:String,
+
+            @NotBlank
+            @FormParam("password")
+            password:String
     ): AccountDTO? {
-        val account = Account(
-                displayName = "")
+        val account = Account()
 
 //        PasswordService.hash("")
         val credential: Credential = CredentialPassword(
                 account = account,
-                email = accountDTO.email!!,
-                password = passwordService.hash(accountDTO.password!!))
+                email = email,
+                password = passwordService.hash(password))
 
         account.credentials.add(credential)
 
@@ -74,7 +79,7 @@ class AccountApi @Autowired constructor(
             @FormParam("vendorId")
             vendorId: String
     ): AccountDTO? {
-        val account = Account(displayName = "")
+        val account = Account()
 
         val vendorIdCredential = CredentialVendorId(
                 account = account,
@@ -87,15 +92,15 @@ class AccountApi @Autowired constructor(
     }
 
 
-    @GET
-    @Path("self")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    fun getAccountInfo(
-            account: Account
-
-    ): AccountDTO {
-        return account.assembleDto()
-    }
+//    @GET
+//    @Path("self")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    fun getAccountInfo(
+//            account: Account
+//
+//    ): AccountDTO {
+//        return account.assembleDto()
+//    }
 
 
 //    @POST
