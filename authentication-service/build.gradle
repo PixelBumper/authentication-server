@@ -41,6 +41,9 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-jersey')
     compile('org.springframework.boot:spring-boot-starter-security')
 
+    // JWT
+    compile group: 'com.auth0', name: 'java-jwt', version: '3.3.0'
+
     // swagger
     compile "io.swagger.core.v3:swagger-jaxrs2:$swaggerVersion"
 
