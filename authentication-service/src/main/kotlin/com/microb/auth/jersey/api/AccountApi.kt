@@ -10,9 +10,16 @@ import com.microb.auth.jersey.dtos.AccountDTO
 import com.microb.auth.jersey.dtos.assembleDto
 import com.microb.auth.security.PasswordService
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
+import java.security.Principal
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import javax.transaction.Transactional
@@ -20,13 +27,17 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 import javax.ws.rs.*
 import javax.ws.rs.container.AsyncResponse
+import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.container.Suspended
+import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.SecurityContext
 
 @Path("/accounts")
 @Produces(MediaType.APPLICATION_JSON)
 @Component
 @OpenAPIDefinition(info = Info(title="wapow"))
+@SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic")
 class AccountApi @Autowired constructor(
         val accountRepository: AccountRepository,
         val credentialRepository: CredentialRepository,
@@ -34,15 +45,24 @@ class AccountApi @Autowired constructor(
 
     @GET
     @Transactional
-    fun getAccounts(): CompletionStage<List<AccountDTO>> {
+    @SecurityRequirement(name = "basicAuth")
+    fun getAccounts(
+            @Parameter(hidden = true)
+            principal: Principal?,
+            @Context
+            securityContext: SecurityContext?,
+            @Context
+            containerRequestContext: ContainerRequestContext?
+    ): List<AccountDTO> {
 //        accountRepository.findAll().forEach { System.err.println(it.credentials[0].type) }
-        return CompletableFuture.supplyAsync { accountRepository.findAll().map { it.assembleDto() } }
+        return accountRepository.findAll().map { it.assembleDto() }
 
     }
 
     @POST
     @Path("create-account-for-email-and-password")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @PreAuthorize("isAnonymous()")
     @Transactional
     fun createEmailAccount(
             @NotBlank
@@ -72,6 +92,7 @@ class AccountApi @Autowired constructor(
     @POST
     @Path("create-account-for-ios-device")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @PreAuthorize("isAnonymous()")
     @Transactional
     fun createAccountForIOSDevice(
             @NotNull
