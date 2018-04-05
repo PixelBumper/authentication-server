@@ -11,13 +11,12 @@ import org.glassfish.jersey.server.TracingConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.stereotype.Component
-import javax.annotation.security.PermitAll
 import javax.ws.rs.ApplicationPath
 
+const val JERSEY_BASE_PATH = "/api"
 
 @Component
-@ApplicationPath("api") // remap jersey path to not hog the error page of spring boot
-@PermitAll
+@ApplicationPath(JERSEY_BASE_PATH) // remap jersey path to not hog the error page of spring boot
 class JerseyConfig : ResourceConfig() {
 
     @Autowired

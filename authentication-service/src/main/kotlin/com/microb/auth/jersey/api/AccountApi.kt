@@ -1,16 +1,15 @@
 package com.microb.auth.jersey.api
 
+import com.microb.auth.jersey.dtos.AccountDTO
+import com.microb.auth.jersey.dtos.assembleDto
 import com.microb.auth.model.entities.Account
 import com.microb.auth.model.entities.Credential
 import com.microb.auth.model.entities.CredentialPassword
 import com.microb.auth.model.entities.CredentialVendorId
 import com.microb.auth.model.repositories.AccountRepository
 import com.microb.auth.model.repositories.CredentialRepository
-import com.microb.auth.jersey.dtos.AccountDTO
-import com.microb.auth.jersey.dtos.assembleDto
 import com.microb.auth.security.PasswordService
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
-import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.info.Info
@@ -20,32 +19,37 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
 import java.security.Principal
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionStage
 import javax.transaction.Transactional
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 import javax.ws.rs.*
-import javax.ws.rs.container.AsyncResponse
 import javax.ws.rs.container.ContainerRequestContext
-import javax.ws.rs.container.Suspended
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.SecurityContext
 
-@Path("/accounts")
+const val ACCOUNT_RESOURCE_BASE_PATH = "accounts"
+const val EMAIL_ACCOUNT_CREATION_PATH = "/create-account-for-email-and-password"
+const val FULL_EMAIL_ACCOUNT_CREATION_PATH = "$ACCOUNT_RESOURCE_BASE_PATH$EMAIL_ACCOUNT_CREATION_PATH"
+const val ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES = "/create-account-for-ios-device"
+const val FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES = "$ACCOUNT_RESOURCE_BASE_PATH${ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES}"
+
+@Path(ACCOUNT_RESOURCE_BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 @Component
-@OpenAPIDefinition(info = Info(title="wapow"))
+@OpenAPIDefinition(info = Info(title = "wapow"))
 @SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic")
 class AccountApi @Autowired constructor(
         val accountRepository: AccountRepository,
         val credentialRepository: CredentialRepository,
         val passwordService: PasswordService) {
+    companion object {
+    }
 
     @GET
     @Transactional
     @SecurityRequirement(name = "basicAuth")
+    @PreAuthorize("hasRole('USER')")
     fun getAccounts(
             @Parameter(hidden = true)
             principal: Principal?,
@@ -60,18 +64,17 @@ class AccountApi @Autowired constructor(
     }
 
     @POST
-    @Path("create-account-for-email-and-password")
+    @Path(EMAIL_ACCOUNT_CREATION_PATH)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @PreAuthorize("isAnonymous()")
     @Transactional
     fun createEmailAccount(
             @NotBlank
             @FormParam("email")
-            email:String,
+            email: String,
 
             @NotBlank
             @FormParam("password")
-            password:String
+            password: String
     ): AccountDTO? {
         val account = Account()
 
@@ -90,9 +93,8 @@ class AccountApi @Autowired constructor(
     }
 
     @POST
-    @Path("create-account-for-ios-device")
+    @Path(ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @PreAuthorize("isAnonymous()")
     @Transactional
     fun createAccountForIOSDevice(
             @NotNull
