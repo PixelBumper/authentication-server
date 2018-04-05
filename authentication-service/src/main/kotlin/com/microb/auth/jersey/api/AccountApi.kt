@@ -28,7 +28,7 @@ import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.SecurityContext
 
-const val ACCOUNT_RESOURCE_BASE_PATH = "accounts"
+const val ACCOUNT_RESOURCE_BASE_PATH = "/accounts"
 const val EMAIL_ACCOUNT_CREATION_PATH = "/create-account-for-email-and-password"
 const val FULL_EMAIL_ACCOUNT_CREATION_PATH = "$ACCOUNT_RESOURCE_BASE_PATH$EMAIL_ACCOUNT_CREATION_PATH"
 const val ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES = "/create-account-for-ios-device"
