@@ -6,8 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-abstract class Credential(
-        account: Account) : BaseEntity() {
+abstract class Credential(account: Account) : BaseEntity() {
 
     @ManyToOne
     @JoinColumn
@@ -20,4 +19,5 @@ abstract class Credential(
 
     @Convert(converter = InstantAttributeConverter::class)
     open var lastTimeSeen: Instant = Instant.now()
+
 }

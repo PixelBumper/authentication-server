@@ -5,17 +5,19 @@ import com.microb.auth.jersey.dtos.assembleDto
 import com.microb.auth.model.entities.Account
 import com.microb.auth.model.entities.Credential
 import com.microb.auth.model.entities.CredentialPassword
-import com.microb.auth.model.entities.CredentialVendorId
 import com.microb.auth.model.repositories.AccountRepository
 import com.microb.auth.model.repositories.CredentialRepository
 import com.microb.auth.security.PasswordService
+import com.microb.auth.services.AccountService
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
 import java.security.Principal
@@ -42,9 +44,9 @@ const val FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES = "$ACCOUNT_RESOURCE_BASE_P
 class AccountApi @Autowired constructor(
         val accountRepository: AccountRepository,
         val credentialRepository: CredentialRepository,
-        val passwordService: PasswordService) {
-    companion object {
-    }
+        val passwordService: PasswordService,
+        val applicationContext: ApplicationContext,
+        val accountService: AccountService) {
 
     @GET
     @Transactional
@@ -95,23 +97,21 @@ class AccountApi @Autowired constructor(
     @POST
     @Path(ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Transactional
+    @ApiResponse(responseCode = "200")
     fun createAccountForIOSDevice(
             @NotNull
-            //            @Valid
             @FormParam("vendorId")
-            vendorId: String
+            vendorId: String,
+
+            @NotNull
+            @FormParam("deviceName")
+            deviceName: String
     ): AccountDTO? {
-        val account = Account()
 
-        val vendorIdCredential = CredentialVendorId(
-                account = account,
-                vendorId = vendorId)
+        return accountService
+                .createAccountForIOSDevice(vendorId, deviceName)
+                .assembleDto()
 
-        account.credentials.add(vendorIdCredential)
-        accountRepository.save(account)
-
-        return account.assembleDto()
     }
 
 
@@ -129,7 +129,7 @@ class AccountApi @Autowired constructor(
 //    @POST
 //    @Consumes(MediaType.APPLICATION_JSON)
 //    @Transactional
-//    fun createAccount(
+//    fun createAccountForIOSDevice(
 //            @NotNull
 //            @Valid
 //            account: AccountDTO?
