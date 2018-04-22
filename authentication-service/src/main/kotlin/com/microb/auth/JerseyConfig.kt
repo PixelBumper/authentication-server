@@ -30,9 +30,11 @@ class JerseyConfig : ResourceConfig() {
     }
 
     private final fun configureJersey() {
+        // ensure non 200 responses are nor redirected to an error page
+        property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true)
         // disable moxy
         property(ServerProperties.MOXY_JSON_FEATURE_DISABLE, true)
-        property(ServerProperties.TRACING, TracingConfig.ALL.name)
+//        property(ServerProperties.TRACING, TracingConfig.ALL.name)
 
         // Register JacksonFeature.
         register(JacksonFeature::class.java)
