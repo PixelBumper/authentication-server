@@ -43,9 +43,6 @@ const val FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES = "$ACCOUNT_RESOURCE_BASE_P
 @SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic")
 class AccountApi @Autowired constructor(
         val accountRepository: AccountRepository,
-        val credentialRepository: CredentialRepository,
-        val passwordService: PasswordService,
-        val applicationContext: ApplicationContext,
         val accountService: AccountService) {
 
     @GET
@@ -60,7 +57,6 @@ class AccountApi @Autowired constructor(
             @Context
             containerRequestContext: ContainerRequestContext?
     ): List<AccountDTO> {
-//        accountRepository.findAll().forEach { System.err.println(it.credentials[0].type) }
         return accountRepository.findAll().map { it.assembleDto() }
 
     }
@@ -78,20 +74,10 @@ class AccountApi @Autowired constructor(
             @FormParam("password")
             password: String
     ): AccountDTO? {
-        val account = Account()
 
-//        PasswordService.hash("")
-        val credential: Credential = CredentialPassword(
-                account = account,
-                email = email,
-                password = passwordService.hash(password))
-
-        account.credentials.add(credential)
-
-        accountRepository.save(account)
-
-
-        return account.assembleDto()
+        return accountService
+                .createAccountForEmail(email, password)
+                .assembleDto()
     }
 
     @POST
@@ -115,29 +101,14 @@ class AccountApi @Autowired constructor(
     }
 
 
-//    @GET
-//    @Path("self")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    fun getAccountInfo(
-//            account: Account
-//
-//    ): AccountDTO {
-//        return account.assembleDto()
-//    }
+    @GET
+    @Path("self")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    fun getAccountInfo(
+            account: Account
 
-
-//    @POST
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Transactional
-//    fun createAccountForIOSDevice(
-//            @NotNull
-//            @Valid
-//            account: AccountDTO?
-//    ): Response {
-//        val account = Account(username = account!!.username!!)
-//        accountRepository.save(account)
-//
-//        return Response.ok(assembleDto(account)).build()
-//    }
+    ): AccountDTO {
+        return account.assembleDto()
+    }
 
 }

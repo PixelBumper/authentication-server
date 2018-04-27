@@ -1,54 +1,97 @@
 package com.microb.auth.services
 
-import com.microb.auth.AuthenticationServiceApplication.Companion.AUTHENTICATION_SERVER
 import com.microb.auth.model.entities.Account
+import com.microb.auth.model.entities.Credential
 import com.microb.auth.model.entities.CredentialIOSDevice
+import com.microb.auth.model.entities.CredentialPassword
 import com.microb.auth.model.repositories.AccountRepository
+import com.microb.auth.model.repositories.CredentialIOSDeviceRepository
+import com.microb.auth.model.repositories.CredentialPasswordRepository
 import com.microb.auth.model.repositories.CredentialRepository
 import com.microb.auth.security.PasswordService
+import com.microb.auth.services.exceptions.ConflictException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
-import java.util.logging.Level
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Response.Status.CONFLICT
 
+const val EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this email"
+const val DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this device id"
 
 @Service
 class AccountService(
         val accountRepository: AccountRepository,
-        val credentialRepository: CredentialRepository,
+        val emailCredentialRepository: CredentialPasswordRepository,
+        val credentialIOSDeviceRepository: CredentialIOSDeviceRepository,
         val passwordService: PasswordService,
         val transactionTemplate: TransactionTemplate
 ) {
 
 
-    fun createAccountForIOSDevice(vendorId: String, deviceName: String): Account {
+    /**
+     * @throws ConflictException when the email is already linked to another account
+     */
+    fun createAccountForEmail(email: String, password: String): Account {
         try {
-            AUTHENTICATION_SERVER.log(Level.WARNING, "wapow")
-            return transactionTemplate.execute {
-
-                val account = Account()
-
-                val vendorIdCredential = CredentialIOSDevice(
-                        account = account,
-                        vendorId = vendorId,
-                        deviceName = deviceName)
-
-                account.credentials.add(vendorIdCredential)
-
-                accountRepository.save(account)
-
-                account
-            }!!
-
+            return createAccountForEmailInternal(email, password)
         } catch (e: DataIntegrityViolationException) {
-            // TODO check if the vendorIdConstraint was violated
-            throw WebApplicationException("there is already an account for this device id", CONFLICT)
+            // TODO check if the emailConstraint was violated
+            throw ConflictException(EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT, e)
         }
 
     }
 
+    @Transactional
+    private fun createAccountForEmailInternal(email: String, password: String): Account {
+        emailCredentialRepository.findByEmail(email)?.let { throw ConflictException(EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT) }
+
+        val account = Account()
+
+        val credential: Credential = CredentialPassword(
+                account = account,
+                email = email,
+                password = passwordService.hash(password))
+
+        account.credentials.add(credential)
+
+        return accountRepository.save(account)
+    }
+
+    /**
+     * @throws ConflictException when the vendorId is already linked to another account
+     */
+    fun createAccountForIOSDevice(vendorId: String, deviceName: String): Account {
+        try {
+            return createAccountForIOSDeviceInternal(vendorId, deviceName)
+
+        } catch (e: DataIntegrityViolationException) {
+            // TODO check if the vendorIdConstraint was violated
+            throw ConflictException(DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT, e)
+        }
+
+    }
+
+    @Transactional
+    private fun createAccountForIOSDeviceInternal(vendorId: String, deviceName: String): Account {
+        credentialIOSDeviceRepository.findByVendorId(vendorId)?.let { throw ConflictException(DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT) }
+
+        val account = Account()
+
+        val vendorIdCredential = CredentialIOSDevice(
+                account = account,
+                vendorId = vendorId,
+                deviceName = deviceName)
+
+        account.credentials.add(vendorIdCredential)
+
+
+        accountRepository.save(account)
+        System.err.println("In a transaction")
+
+        return account
+    }
 
 
 }
