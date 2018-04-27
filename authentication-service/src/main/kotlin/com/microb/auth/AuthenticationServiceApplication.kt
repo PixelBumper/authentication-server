@@ -9,6 +9,7 @@ import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver
 import java.util.logging.Logger
 import com.sun.tools.javac.tree.TreeInfo.args
 import org.aspectj.weaver.loadtime.Agent
+import org.slf4j.LoggerFactory
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.annotation.*
 import org.springframework.instrument.classloading.LoadTimeWeaver
@@ -68,6 +69,10 @@ fun main(args: Array<String>) {
 @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
 @EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)
 class AuthenticationServiceApplication {
+
+    companion object {
+        val LOG = LoggerFactory.getLogger("AuthenticationService")!!
+    }
 
     /**
      * this ensures spring uses the right load time weaver
