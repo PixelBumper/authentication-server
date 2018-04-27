@@ -37,6 +37,7 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-reflect")
 
     //spring
+    compile('org.springframework.boot:spring-boot-starter-aop')
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-jersey')
     compile('org.springframework.boot:spring-boot-starter-security')
@@ -52,6 +53,8 @@ dependencies {
     compile group: 'com.lambdaworks', name: 'scrypt', version: '1.4.0'
     compile 'de.mkammerer:argon2-jvm:2.2'
 
+    compile("org.aspectj:aspectjrt")
+    compile("org.aspectj:aspectjweaver")
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
