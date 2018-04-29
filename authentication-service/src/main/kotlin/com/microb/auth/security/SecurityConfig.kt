@@ -5,6 +5,7 @@ import com.microb.auth.jersey.api.FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES
 import com.microb.auth.jersey.api.FULL_EMAIL_ACCOUNT_CREATION_PATH
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -12,8 +13,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.NoOpPasswordEncoder
 
 
+@Configuration
 @EnableWebSecurity
-class SecurityConfig : WebSecurityConfigurerAdapter() {
+class SecurityConfig (
+        val anonymousIOSDeviceAuthenticationProvider: AnonymousIOSDeviceAuthenticationProvider
+): WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
         http
@@ -33,8 +37,10 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Autowired
     fun configureGlobal(auth: AuthenticationManagerBuilder) {
         auth
+                .authenticationProvider(anonymousIOSDeviceAuthenticationProvider)
                 .inMemoryAuthentication()
                 .withUser("user").password("password").roles("USER")
+
     }
 
     companion object {
