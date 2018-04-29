@@ -12,13 +12,13 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 compileKotlin {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict"]
+        freeCompilerArgs = ["-Xjsr305=strict", '-Xenable-jvm-default']
         jvmTarget = "1.8"
     }
 }
 compileTestKotlin {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict"]
+        freeCompilerArgs = ["-Xjsr305=strict", '-Xenable-jvm-default']
         jvmTarget = "1.8"
     }
 }
@@ -35,6 +35,7 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-reflect")
 
     //spring
+
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
 
     compile group: 'com.h2database', name: 'h2', version: '1.4.194'
