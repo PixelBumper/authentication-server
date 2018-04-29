@@ -7,15 +7,12 @@ import com.microb.auth.model.entities.CredentialPassword
 import com.microb.auth.model.repositories.AccountRepository
 import com.microb.auth.model.repositories.CredentialIOSDeviceRepository
 import com.microb.auth.model.repositories.CredentialPasswordRepository
-import com.microb.auth.model.repositories.CredentialRepository
 import com.microb.auth.security.PasswordService
 import com.microb.auth.services.exceptions.ConflictException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
-import javax.ws.rs.WebApplicationException
-import javax.ws.rs.core.Response.Status.CONFLICT
 
 const val EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this email"
 const val DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this device id"
@@ -65,7 +62,6 @@ class AccountService(
     fun createAccountForIOSDevice(vendorId: String, deviceName: String): Account {
         try {
             return createAccountForIOSDeviceInternal(vendorId, deviceName)
-
         } catch (e: DataIntegrityViolationException) {
             // TODO check if the vendorIdConstraint was violated
             throw ConflictException(DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT, e)
@@ -86,9 +82,7 @@ class AccountService(
 
         account.credentials.add(vendorIdCredential)
 
-
         accountRepository.save(account)
-        System.err.println("In a transaction")
 
         return account
     }

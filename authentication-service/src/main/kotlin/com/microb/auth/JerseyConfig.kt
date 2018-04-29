@@ -7,7 +7,6 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource
 import org.glassfish.jersey.jackson.JacksonFeature
 import org.glassfish.jersey.server.ResourceConfig
 import org.glassfish.jersey.server.ServerProperties
-import org.glassfish.jersey.server.TracingConfig
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.stereotype.Component

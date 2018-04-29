@@ -1,19 +1,16 @@
 package com.microb.auth
 
 import com.sun.tools.attach.VirtualMachine
+import org.aspectj.weaver.loadtime.Agent
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.AdviceMode
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.EnableLoadTimeWeaving
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver
-import java.util.logging.Logger
-import com.sun.tools.javac.tree.TreeInfo.args
-import org.aspectj.weaver.loadtime.Agent
-import org.slf4j.LoggerFactory
-import org.springframework.boot.builder.SpringApplicationBuilder
-import org.springframework.context.annotation.*
-import org.springframework.instrument.classloading.LoadTimeWeaver
-import org.springframework.instrument.classloading.tomcat.TomcatLoadTimeWeaver
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import java.io.File
 import java.lang.management.ManagementFactory
@@ -57,8 +54,8 @@ fun dynamicallyLoadAspectJAgent(): Boolean {
 }
 
 fun main(args: Array<String>) {
-    if(!isAspectJAgentLoaded()){
-       throw RuntimeException()
+    if (!isAspectJAgentLoaded()) {
+        throw RuntimeException()
     }
     runApplication<AuthenticationServiceApplication>(*args)
 }

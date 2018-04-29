@@ -3,11 +3,7 @@ package com.microb.auth.jersey.api
 import com.microb.auth.jersey.dtos.AccountDTO
 import com.microb.auth.jersey.dtos.assembleDto
 import com.microb.auth.model.entities.Account
-import com.microb.auth.model.entities.Credential
-import com.microb.auth.model.entities.CredentialPassword
 import com.microb.auth.model.repositories.AccountRepository
-import com.microb.auth.model.repositories.CredentialRepository
-import com.microb.auth.security.PasswordService
 import com.microb.auth.services.AccountService
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.Parameter
@@ -17,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
 import java.security.Principal

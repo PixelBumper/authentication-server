@@ -2,7 +2,6 @@ package com.microb.auth.jersey.mappers
 
 import com.microb.auth.AuthenticationServiceApplication.Companion.LOG
 import com.microb.auth.jersey.dtos.ErrorMessageDTO
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import javax.ws.rs.core.Response
@@ -11,7 +10,7 @@ import javax.ws.rs.ext.Provider
 
 @Provider
 @Component
-class AllExceptionMapper:ExceptionMapper<Throwable>{
+class AllExceptionMapper : ExceptionMapper<Throwable> {
 
     override fun toResponse(exception: Throwable): Response {
 

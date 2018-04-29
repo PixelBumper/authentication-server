@@ -3,7 +3,6 @@ package com.microb.auth.jersey.mappers
 
 import com.microb.auth.AuthenticationServiceApplication.Companion.LOG
 import com.microb.auth.jersey.dtos.ErrorMessageDTO
-import org.slf4j.LoggerFactory
 import javax.ws.rs.ClientErrorException
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.MediaType
@@ -17,7 +16,7 @@ class WebApplicationExceptionMapper : ExceptionMapper<WebApplicationException> {
 
     override fun toResponse(exception: WebApplicationException): Response {
 
-        if (exception is ClientErrorException){
+        if (exception is ClientErrorException) {
             LOG.info(exception.message, exception)
         } else {
             LOG.error(exception.message, exception)

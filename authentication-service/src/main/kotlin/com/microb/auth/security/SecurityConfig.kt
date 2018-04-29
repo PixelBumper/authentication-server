@@ -15,9 +15,9 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig (
+class SecurityConfig(
         val anonymousIOSDeviceAuthenticationProvider: AnonymousIOSDeviceAuthenticationProvider
-): WebSecurityConfigurerAdapter() {
+) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
         http
