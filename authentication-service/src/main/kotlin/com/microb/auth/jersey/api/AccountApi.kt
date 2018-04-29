@@ -100,9 +100,11 @@ class AccountApi @Autowired constructor(
     @Path("self")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     fun getAccountInfo(
-            account: Account
-
+            @Context
+            securityContext: SecurityContext
     ): AccountDTO {
+        val accountId = securityContext.userPrincipal.name
+        val account = accountRepository.findById(accountId) ?: throw RuntimeException("security contexts should always contain an existing account as principal")
         return account.assembleDto()
     }
 

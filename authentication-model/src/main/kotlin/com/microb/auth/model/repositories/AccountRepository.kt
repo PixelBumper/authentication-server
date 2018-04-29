@@ -5,4 +5,8 @@ import java.util.*
 
 interface AccountRepository : BaseRepository<Account, UUID> {
 
+    @JvmDefault
+    fun findById(uuid:String): Account?{
+        return findById(UUID.fromString(uuid)).orElse(null)
+    }
 }
