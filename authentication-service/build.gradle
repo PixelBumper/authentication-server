@@ -30,12 +30,15 @@ repositories {
 }
 
 dependencies {
+    // TODO figure out if this can be included in another way
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
+
     // project dependencies
     compile project(":authentication-model")
 
     // kotlin
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8")
-    compile("org.jetbrains.kotlin:kotlin-reflect")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
     //spring
     compile('org.springframework.boot:spring-boot-starter-aop')
