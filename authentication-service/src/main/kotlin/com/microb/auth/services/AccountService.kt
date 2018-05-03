@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import javax.ws.rs.core.SecurityContext
 
 const val EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this email"
 const val DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this device id"
@@ -85,5 +86,12 @@ class AccountService(
         return account
     }
 
+
+    @Transactional
+    fun getAccountOfSecurityContext(securityContext: SecurityContext): Account {
+        val accountId = securityContext.userPrincipal.name
+        return accountRepository.findById(accountId)
+                ?: throw RuntimeException("security contexts should always contain an existing account as principal")
+    }
 
 }
