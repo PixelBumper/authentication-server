@@ -1,9 +1,6 @@
 package com.microb.auth.services
 
-import com.microb.auth.model.entities.Account
-import com.microb.auth.model.entities.Credential
-import com.microb.auth.model.entities.CredentialIOSDevice
-import com.microb.auth.model.entities.CredentialPassword
+import com.microb.auth.model.entities.*
 import com.microb.auth.model.repositories.AccountRepository
 import com.microb.auth.model.repositories.CredentialIOSDeviceRepository
 import com.microb.auth.model.repositories.CredentialPasswordRepository
@@ -71,7 +68,8 @@ class AccountService(
 
     @Transactional
     private fun createAccountForIOSDeviceInternal(vendorId: String, deviceName: String): Account {
-        credentialIOSDeviceRepository.findByVendorId(vendorId)?.let { throw ConflictException(DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT) }
+        val credentialIOSDevice = QCredentialIOSDevice.credentialIOSDevice
+        credentialIOSDeviceRepository.findAll(credentialIOSDevice.vendorId.eq(vendorId)).any { throw ConflictException(DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT) }
 
         val account = Account()
 
