@@ -6,6 +6,7 @@ import com.microb.auth.model.repositories.CredentialIOSDeviceRepository
 import com.microb.auth.model.repositories.CredentialPasswordRepository
 import com.microb.auth.security.PasswordService
 import com.microb.auth.services.exceptions.ConflictException
+import com.microb.auth.services.exceptions.NotAuthorizedException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,13 +16,16 @@ import javax.ws.rs.core.SecurityContext
 const val EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this email"
 const val DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this device id"
 
+const val THERE_WAS_NO_PRINCIPAL_SET_IN_THE_SECURITY_CONTEXT = "there was no principal set in the security context"
+const val THE_PRINCIPAL_DID_NOT_HAVE_A_NON_BLANK_NAME = "the principal did not have a non blank name"
+
 @Service
 class AccountService(
-        val accountRepository: AccountRepository,
-        val emailCredentialRepository: CredentialPasswordRepository,
-        val credentialIOSDeviceRepository: CredentialIOSDeviceRepository,
-        val passwordService: PasswordService,
-        val transactionTemplate: TransactionTemplate
+        private val accountRepository: AccountRepository,
+        private val emailCredentialRepository: CredentialPasswordRepository,
+        private val credentialIOSDeviceRepository: CredentialIOSDeviceRepository,
+        private val passwordService: PasswordService,
+        private val transactionTemplate: TransactionTemplate
 ) {
 
 
@@ -81,17 +85,21 @@ class AccountService(
 
         account.credentials.add(vendorIdCredential)
 
-        accountRepository.save(account)
-
-        return account
+        return accountRepository.save(account)
     }
 
 
     @Transactional
     fun getAccountOfSecurityContext(securityContext: SecurityContext): Account {
-        val accountId = securityContext.userPrincipal.name
+        val userPrincipal = securityContext.userPrincipal ?: throw NotAuthorizedException(THERE_WAS_NO_PRINCIPAL_SET_IN_THE_SECURITY_CONTEXT)
+
+        val accountId = userPrincipal.name
+        if (accountId.isNullOrBlank()){
+            throw NotAuthorizedException(THE_PRINCIPAL_DID_NOT_HAVE_A_NON_BLANK_NAME)
+        }
+
         return accountRepository.findById(accountId)
-                ?: throw RuntimeException("security contexts should always contain an existing account as principal")
+                ?: throw RuntimeException("there was no account for accountId '$accountId'")
     }
 
 }
