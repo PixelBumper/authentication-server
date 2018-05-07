@@ -217,4 +217,18 @@ class AccountServiceTest {
         accountService.getAccountOfSecurityContext(securityContext)
     }
 
+    @Test
+    fun `ensure that a RuntimeException is thrown when trying to get an account for a principal that has no account`(){
+        val principal = mock(Principal::class.java)
+        doReturn("some accountId").`when`(principal).name
+
+        val securityContext = mock(SecurityContext::class.java)
+        doReturn(principal).`when`(securityContext).userPrincipal
+
+        exception.expect(RuntimeException::class.java)
+        exception.expectMessage(THERE_WAS_NO_ACCOUNT_FOR_ACCOUNT_ID)
+
+        accountService.getAccountOfSecurityContext(securityContext)
+    }
+
 }

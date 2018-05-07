@@ -19,6 +19,8 @@ const val DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an acc
 const val THERE_WAS_NO_PRINCIPAL_SET_IN_THE_SECURITY_CONTEXT = "there was no principal set in the security context"
 const val THE_PRINCIPAL_DID_NOT_HAVE_A_NON_BLANK_NAME = "the principal did not have a non blank name"
 
+const val THERE_WAS_NO_ACCOUNT_FOR_ACCOUNT_ID = "there was no account for accountId "
+
 @Service
 class AccountService(
         private val accountRepository: AccountRepository,
@@ -99,7 +101,7 @@ class AccountService(
         }
 
         return accountRepository.findById(accountId)
-                ?: throw RuntimeException("there was no account for accountId '$accountId'")
+                ?: throw RuntimeException("$THERE_WAS_NO_ACCOUNT_FOR_ACCOUNT_ID'$accountId'")
     }
 
 }
