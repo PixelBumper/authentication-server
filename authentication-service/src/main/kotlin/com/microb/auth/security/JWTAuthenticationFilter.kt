@@ -1,14 +1,13 @@
 package com.microb.auth.security
 
 import com.microb.auth.services.JWTService
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import org.springframework.security.core.context.SecurityContextHolder
-
 
 /**
  * This filter is responsible for getting the JWT token from the request cookie if present.
@@ -26,7 +25,7 @@ class JWTAuthenticationFilter(
 
 
         val jwtCookieList = request.cookies
-                ?.filter { it.name == "jwt"}
+                ?.filter { it.name == "jwt" }
                 ?: emptyList()
 
         if (jwtCookieList.size == 1) {
@@ -36,10 +35,5 @@ class JWTAuthenticationFilter(
             }
         }
         filterChain.doFilter(request, response)
-    }
-
-    companion object {
-        val SECRET = "SecretKeyToGenJWTs"
-        val EXPIRATION_TIME: Long = 864000000 // 10 days
     }
 }

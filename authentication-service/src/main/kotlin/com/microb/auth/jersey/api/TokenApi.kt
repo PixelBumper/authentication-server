@@ -1,6 +1,6 @@
 package com.microb.auth.jersey.api
 
-import com.microb.auth.security.JWTAuthenticationFilter.Companion.EXPIRATION_TIME
+import com.microb.auth.services.EXPIRATION_TIME
 import com.microb.auth.services.JWTService
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.security.SecurityScheme
@@ -39,7 +39,6 @@ class TokenApi(
     ): Response {
 
         val token = JWTService.createToken(username, password)
-
         return Response
                 .ok()
                 .cookie(NewCookie(
