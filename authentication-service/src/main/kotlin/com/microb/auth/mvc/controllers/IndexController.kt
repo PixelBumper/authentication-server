@@ -1,8 +1,11 @@
 package com.microb.auth.mvc.controllers
 
 import org.springframework.boot.web.servlet.error.ErrorController
+
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+
+private const val PATH = "/error"
 
 @RestController
 class IndexController : ErrorController {
@@ -14,9 +17,5 @@ class IndexController : ErrorController {
 
     override fun getErrorPath(): String {
         return PATH
-    }
-
-    companion object {
-        const private val PATH = "/error"
     }
 }
