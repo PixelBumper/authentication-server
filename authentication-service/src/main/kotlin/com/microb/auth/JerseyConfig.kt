@@ -47,6 +47,7 @@ class JerseyConfig : ResourceConfig() {
     private final fun registerEndpoints() {
 
         packages(true, AccountApi::class.java.`package`.name)
+        register(TokenApi::class.java)
         register(AccountApi::class.java)
         register(AllExceptionMapper::class.java)
         register(WebApplicationExceptionMapper::class.java)
