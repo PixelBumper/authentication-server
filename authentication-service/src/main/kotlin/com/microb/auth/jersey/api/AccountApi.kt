@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,8 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
 import java.security.Principal
 import javax.transaction.Transactional
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
+import javax.validation.constraints.*
 import javax.ws.rs.*
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Context
@@ -61,11 +62,21 @@ class AccountApi @Autowired constructor(
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Transactional
     fun createEmailAccount(
-            @NotBlank
+            @Parameter(schema = Schema(
+                    type = "string",
+                    format = "email"))
+            @NotBlank(message = "you need to provide a valid email address")
+            @Email
             @FormParam("email")
+            @Max(254, message = "the email address was too long")
             email: String,
 
-            @NotBlank
+            @Parameter(schema = Schema(
+                    type = "string",
+                    format = "password"))
+            @NotBlank(message = "you need to provide a password")
+            @Min(8, message = "the password was too short")
+            @Max(256, message = "the password was too long")
             @FormParam("password")
             password: String
     ): AccountDTO? {
@@ -80,11 +91,11 @@ class AccountApi @Autowired constructor(
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @ApiResponse(responseCode = "200")
     fun createAccountForIOSDevice(
-            @NotNull
+            @NotBlank(message = "you need to provide a vendor id")
             @FormParam("vendorId")
             vendorId: String,
 
-            @NotNull
+            @NotBlank(message = "you need to provide the name of the device")
             @FormParam("deviceName")
             deviceName: String
     ): AccountDTO? {
