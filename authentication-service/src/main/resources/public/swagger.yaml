@@ -1,0 +1,840 @@
+swagger: '2.0'
+info:
+  description: >-
+    This is the HK World server API. It describes what resoures the clients can
+    access to play the game.
+
+
+
+        In order to access the World Server API the clients needs to have to
+    complete a registration process:
+
+
+
+        1. Create new accounts by posting their credential to the `/v1/login`
+    resource on the **HK Login Server.**
+
+
+
+        2. After creating a new account the client needs to request an access
+    token via a /token resource on the WorldServer The token resource is secured
+    via basic Authentification.
+
+          Depending on the account type different values are expected for the
+    Basic authentication username and password
+
+
+
+          **anonymous**
+
+
+
+          Authorization: Basic deviceid:<device id>
+
+
+
+          **email**
+
+
+
+          Authorization: Basic <email>:<passwordHash>
+
+
+
+          **facebook**
+
+
+
+          Authorization: Basic facebook:<fbToken>
+
+
+
+          **google+**
+
+
+
+          Authorization: Basic googleplus:<g+Token>
+
+
+
+        3. After this the client can start to play on the world by creating a new
+    Player on the world by invoking `POST /players/self`
+  version: 0.1.0-alpha
+  title: The HK WorldServer Api
+  contact:
+    name: HK Backend team
+    email: backend@xyrality.com
+  license:
+    name: '(c) Copyright 2015 XYRALITY GmbH, all rights reserved.'
+host: '10.10.3.19:2102'
+basePath: /XYRALITY/WebObjects/HKWorldServer-developer.woa/rs
+tags:
+  - name: player
+  - name: public
+  - name: habitat
+  - name: alliance
+  - name: map
+  - name: test
+  - name: token
+  - name: private
+  - name: building
+  - name: segment
+  - name: inventory
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/login:
+    get:
+      parameters:
+      responses:
+  /v1/players/self/battles:
+    post:
+      parameters:
+        - name: target
+          type: integer
+          description: the id of the habitat to attack
+        - name: units
+          type: array
+          items:
+            $ref: '#/definitions/UnitDTO'
+      responses:
+        '201':
+          description: a battle result
+          schema:
+            $ref: '#/definitions/BattleDTO'
+
+  /v1/map/tiles:
+    get:
+      summary: retrieve map tiles 
+      description: The client can either pass the tile id and a range to get the sorounding map tiles, or a list of tiles
+      operationId: readMapTiles
+      parameters:
+        - name: tileIds
+          in: query
+          type: array
+          description: 'a list of map tile ids'
+          items: 
+            type: integer
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/TileDTO'
+      security:
+        - sessionAuth: []
+  /v1/players/self/units:
+    get:
+      summary: get units of the player
+      responses:
+       200:
+          description: OK
+          schema:
+            $ref: '#/definitions/UnitDTO'
+  /v1/players:
+    get:
+      tags:
+        - player
+        - public
+      summary: Search and list players
+      description: Search and list players
+      operationId: readPlayers
+      produces:
+        - application/json
+      parameters:
+        - name: nick
+          in: query
+          description: Player name to search
+          required: false
+          type: string
+          default: '*'
+        - name: orderBy
+          in: query
+          description: Sort property on which the list shall be ordered
+          required: false
+          type: string
+          default: rank
+          enum:
+            - rank
+            - name
+        - name: offset
+          in: query
+          description: Start offset in the list from which the alliances should be listed
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: Max. number of alliances that shall be returned
+          required: false
+          type: integer
+          default: 30
+          format: int32
+      responses:
+        '200':
+          description: the player information
+          schema:
+            $ref: '#/definitions/PlayerPublicDTO'
+        '401':
+          description: Not authorized
+          schema:
+            $ref: '#/definitions/ErrorMessageDTO'
+      security:
+        - sessionAuth: []
+    post:
+      tags:
+        - private
+      summary: Create player
+      description: |-
+        Creates a new player on the world.
+        Note: This can only be done once per Login.
+      operationId: createPlayer
+      produces:
+        - application/json
+      parameters:
+        - name: nick
+          in: query
+          description: the nickname of the new player
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/PlayerDTO'
+        '201':
+          description: The newly created player
+          schema:
+            $ref: '#/definitions/PlayerDTO'
+        '400':
+          description: Parameters where missing or invalid
+          schema:
+            $ref: '#/definitions/ErrorMessageDTO'
+        '401':
+          description: Not authorized
+          schema:
+            $ref: '#/definitions/ErrorMessageDTO'
+        '409':
+          description: The player is already playing on this world or the username was already taken. check the error message.
+          schema:
+            $ref: '#/definitions/ErrorMessageDTO'
+      security:
+        - credentialsAuth: []
+  /v1/players/self:
+    get:
+      tags:
+        - player
+        - private
+      summary: Get logged in player
+      description: Get logged in player
+      operationId: getSelf
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: the player information
+          schema:
+            $ref: '#/definitions/PlayerDTO'
+        '401':
+          description: Not authorized
+          schema:
+            $ref: '#/definitions/ErrorMessageDTO'
+      security:
+        - sessionAuth: []
+    patch:
+      tags:
+        - player
+        - private
+      summary: Update player
+      description: Update player that is logged in
+      operationId: patchSelfPlayer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: player
+          in: query
+          description: a partial PlayerDTO containing the properties to change
+          required: true
+          type: string
+      responses:
+        '200':
+          description: The player settings have been updated and the current player is returned.
+          schema:
+            $ref: '#/definitions/PlayerDTO'
+        '401':
+          description: Not authorized
+          schema:
+            $ref: '#/definitions/PlayerDTO'
+      security:
+        - sessionAuth: []
+  /v1/players/self/habitats:
+    get:
+      tags:
+        - private
+        - habitat
+      summary: Get all habitats for player
+      description: Get all habitats for player
+      operationId: readSelfHabitats
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: the habitat information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/HabitatDTO'
+        '401':
+          description: Not authorized
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/HabitatDTO'
+      security:
+        - sessionAuth: []
+  /v1/players/self/habitats/main:
+    get:
+      tags:
+        - private
+        - habitat
+      summary: Get main habitat for player
+      description: Get main habitat for player
+      operationId: readSelfMainHabitat
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: the habitat information
+          schema:
+            $ref: '#/definitions/HabitatDTO'
+        '401':
+          description: Not authorized
+          schema:
+            $ref: '#/definitions/HabitatDTO'
+      security:
+        - sessionAuth: []
+  '/v1/players/self/habitats/main/buildings/{buildingId}/levelup':
+    put:
+      tags:
+        - private
+        - building
+      summary: Level up a building
+      description: Level up a building
+      operationId: levelUpMainBuilding
+      produces:
+        - application/json
+      parameters:
+        - name: buildingId
+          in: path
+          description: Building id
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: the changed building
+          schema:
+            $ref: '#/definitions/BuildingDTO'
+        '404':
+          description: Habitat not found
+          schema:
+            $ref: '#/definitions/WorldErrorResponses'
+        '409':
+          description: Wrong parameter
+          schema:
+            $ref: '#/definitions/WorldErrorResponses'
+      security:
+        - sessionAuth: []
+  '/v1/players/self/habitats/main/buildings/{identifier}':
+    put:
+      tags:
+        - private
+        - building
+      summary: Add a building to a habitat
+      description: Add a building to a habitat
+      operationId: addBuildingToMain
+      produces:
+        - application/json
+      parameters:
+        - name: identifier
+          in: path
+          description: building name
+          required: true
+          type: string
+        - name: segment
+          in: query
+          description: segment name
+          required: false
+          type: string
+        - name: position
+          in: query
+          description: position name
+          required: false
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: the habitat information
+          schema:
+            $ref: '#/definitions/HabitatDTO'
+        '404':
+          description: Habitat not found
+          schema:
+            $ref: '#/definitions/HabitatDTO'
+        '409':
+          description: Wrong parameter
+          schema:
+            $ref: '#/definitions/HabitatDTO'
+      security:
+        - sessionAuth: []
+  '/v1/players/self/habitats/main/segments/{name}':
+    put:
+      tags:
+        - private
+        - segment
+      summary: Add a segment to a habitat
+      description: Add a segment to a habitat
+      operationId: addSegment
+      produces:
+        - application/json
+      parameters:
+        - name: habitatId
+          in: query
+          description: Habitat id
+          required: true
+          type: integer
+          format: int32
+        - name: name
+          in: path
+          description: segment name
+          required: true
+          type: string
+      responses:
+        '200':
+          description: the habitat information
+          schema:
+            $ref: '#/definitions/HabitatDTO'
+        '404':
+          description: Habitat not found
+          schema:
+            $ref: '#/definitions/WorldErrorResponses'
+        '409':
+          description: Wrong parameter
+          schema:
+            $ref: '#/definitions/WorldErrorResponses'
+      security:
+        - sessionAuth: []
+  /v1/token:
+    post:
+      tags:
+        - token
+      summary: Get access token
+      description: This resource allows to retrieve access tokens for the HK World Server api
+      operationId: retrieveToken
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/TokenDTO'
+        '201':
+          description: Token was successfully generated
+          schema:
+            $ref: '#/definitions/TokenDTO'
+        '401':
+          description: Not authorized
+          schema:
+            $ref: '#/definitions/ErrorMessageDTO'
+        '404':
+          description: Player not found
+          schema:
+            $ref: '#/definitions/ErrorMessageDTO'
+      security:
+        - credentialsAuth: []
+securityDefinitions:
+  credentialsAuth:
+    description: "HTTP Basic authentication for accessing **Login Server** resources and retrieving **World Server** access tokens.\n\nIt expects the base 64 encoded username and password.\nDepending on the account type different values are expected for the Basic authentication username and password \n\n**anonymous**\n\ndeviceid:&lt;deviceid&gt;\n\n**email**\n\n&lt;email&gt;:&lt;passwordHash&gt;\n\n**facebook**\n\nfacebook:&lt;fbToken&gt;\n\n**google+**\n\ngoogleplus:&lt;g+Token&gt;\n"
+    type: basic
+  sessionAuth:
+    type: basic
+    description: session
+definitions:
+  InventoryDTO:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/ItemDTO'
+      inventoryMax:
+        type: integer
+        format: int32
+    xml:
+      name: inventory
+  PlayerDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: player id
+      accountId:
+        type: integer
+        format: int32
+        description: the account id
+      nick:
+        type: string
+        description: player nickname
+        pattern: "[^\\p{Cntrl}].{3,50}"
+      points:
+        type: integer
+        format: int32
+        description: current player points
+      rank:
+        type: integer
+        format: int32
+        description: rank on this world
+      lastReadForumDate:
+        description: indicates when the forum was read the last time
+        $ref: '#/definitions/Instant'
+      lastReadReportDate:
+        description: indicates when the reports were read the last time
+        $ref: '#/definitions/Instant'
+      remainingVacationHours:
+        type: integer
+        format: int32
+        description: hours the user can spend in vacation mode
+      gold:
+        type: integer
+        format: int32
+        description: the users gold
+      alliancePermission:
+        type: integer
+        format: int32
+        description: the permissions the user has in his alliance
+      availableMissionsArray:
+        type: array
+        items:
+          type: integer
+          format: int32
+      habitat:
+        description: habitat
+        $ref: '#/definitions/HabitatDTO'
+      alliance:
+        $ref: '#/definitions/AllianceDTO'
+      takenHabitats:
+        type: array
+        items:
+          $ref: '#/definitions/HabitatDTO'
+      units:
+        type: array
+        items:
+          $ref: '#/definitions/UnitDTO'
+    description: The representation of the player
+    xml:
+      name: player
+  HabitatPublicDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: 'the unique id, also defines the position on the map'
+      habitatType:
+        type: integer
+        format: int32
+        description: 'possible values: nothing (1), player (2), resource (3), buff (4), mission (5), obelisk (6), placeholder (31)'
+      resources:
+        type: string
+      owner:
+        type: 
+        $ref: '#/definitions/PlayerPublicDTO'
+    description: The public representation of a habitat
+    xml:
+      name: habitat
+  Instant:
+    type: object
+    properties:
+      nano:
+        type: integer
+        format: int32
+      epochSecond:
+        type: integer
+        format: int64
+  PlayerPublicDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: player id
+      nick:
+        type: string
+        description: player nickname
+      points:
+        type: integer
+        format: int32
+        description: current player points
+      rank:
+        type: array
+        items:
+          $ref: '#/definitions/RankDTO'
+      habitat:
+        description: main habitat
+        $ref: '#/definitions/HabitatPublicDTO'
+      alliance:
+        description: alliance
+        $ref: '#/definitions/AlliancePublicDTO'
+      takenHabitats:
+        type: array
+        items:
+          $ref: '#/definitions/HabitatPublicDTO'
+    description: The public representation of the player
+    xml:
+      name: player
+  ErrorMessageDTO:
+    type: object
+    properties:
+      httpStatus:
+        type: integer
+        format: int32
+        description: The http status code
+      message:
+        type: string
+        description: A description of the error that has occoured
+    description: Error message object
+    xml:
+      name: errorMessage
+  TokenDTO:
+    type: object
+    properties:
+      token:
+        type: string
+        description: The access token
+      loginId:
+        type: integer
+        format: int32
+        description: the loginId of the account associated with the access token
+    description: 'A player access token '
+    xml:
+      name: player
+  HabitatDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: 'the unique id, also defines the position on the map'
+      player:
+        description: owning player
+        $ref: '#/definitions/PlayerDTO'
+      habitatType:
+        type: integer
+        format: int32
+        description: 'possible values: nothing (1), player (2), resource (3), buff (4), mission (5), obelisk (6), placeholder (31)'
+      lastUpdate:
+        description: last updated
+        $ref: '#/definitions/Instant'
+      name:
+        type: string
+        description: name
+      href:
+        type: string
+      resources:
+        type: string
+        description: resources
+      enabledSegments:
+        type: array
+        description: enabled segments
+        items:
+          type: string
+      buildings:
+        type: array
+        description: assigned buildings
+        items:
+          $ref: '#/definitions/BuildingDTO'
+      segments:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            type: string
+    xml:
+      name: habitat
+  AllianceDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: unique id
+      name:
+        type: string
+        description: name
+        pattern: "[^\\p{Cntrl}].{3,50}"
+      descriptionText:
+        type: string
+        description: a description
+      rank:
+        type: integer
+        format: int32
+        description: current rank
+      points:
+        type: integer
+        format: int32
+        description: current accumulated points
+      founder:
+        description: founder of the alliance
+        $ref: '#/definitions/PlayerDTO'
+      playerArray:
+        type: array
+        description: members of alliance
+        items:
+          $ref: '#/definitions/PlayerDTO'
+    xml:
+      name: alliance
+  ItemDTO:
+    type: object
+    properties:
+      baseId:
+        type: string
+      lastUse:
+        $ref: '#/definitions/Instant'
+      stackSize:
+        type: integer
+        format: int32
+  AlliancePublicDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: unique id
+      name:
+        type: string
+        description: name
+      descriptionText:
+        type: string
+        description: a description
+      rank:
+        type: integer
+        format: int32
+        description: current rank
+      points:
+        type: integer
+        format: int32
+        description: current accumulated points
+      founder:
+        description: founder of alliance
+        $ref: '#/definitions/PlayerPublicDTO'
+      playerArray:
+        type: array
+        description: members of alliance
+        items:
+          $ref: '#/definitions/PlayerPublicDTO'
+    description: The public representation of an alliance
+  RankDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: the id
+      nickname:
+        type: string
+        description: player name
+      type:
+        type: string
+        description: defines ranking type
+      row:
+        type: integer
+        format: int32
+      rank:
+        type: integer
+        format: int32
+  TileDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: the tile id
+      type:
+        type: integer
+        description: the type of tile
+      habitat:
+        $ref: '#/definitions/HabitatPublicDTO'
+  UnitDTO:
+    type: object
+    properties:
+      id:
+        type: string
+        description: the unit id
+      type:
+        type: string
+        description: the type of unit
+      amount:
+        type: integer
+        description: number of units
+  BattleDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: The id of the batle
+      time:
+        type: string
+        description: time when the battle was finished
+      outcome:
+        type: string
+        description: success or failure
+  BuildingDTO:
+    type: object
+    properties:
+      type:
+        type: string
+        description: the type of the building
+      buildingId:
+        type: integer
+        format: int32
+      building:
+        type: string
+        description: building name
+      position:
+        type: integer
+        format: int32
+        description: position in segment
+      segment:
+        type: string
+        description: containing segment
+      level:
+        type: integer
+        format: int32
+        description: current level
+    xml:
+      name: habitat
+  WorldErrorResponses:
+    type: object
+externalDocs:
+  description: HK Confluence Space
+  url: 'https://confluence.xyrality.net/display/XYZ/Overview'

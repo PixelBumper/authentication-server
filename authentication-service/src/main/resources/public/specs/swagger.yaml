@@ -1,0 +1,238 @@
+swagger: '2.0'
+info:
+ version: 0.0.1
+ title: 'HK World Server API'
+ description: |
+   This is the HK World server API. It describes what resourses the clients can access to play the game.
+
+   In order to access the World Server API the clients needs to have to complete a registration process:
+
+   1. Create new accounts by posting their credential to the `/login` resource on the **HK Login Server.**
+
+   2. After creating a new account the client needs to request an access token via a /token resource on the WorldServer The token resource is secured via basic Authentification.
+     Depending on the account type different values are expected for the Basic authentication username and password 
+
+     **anonymous**
+
+     Authorization: Basic deviceid:&lt;deviceid&gt;
+
+     **email**
+
+     Authorization: Basic &lt;email&gt;:&lt;passwordHash&gt;
+
+     **facebook**
+
+     Authorization: Basic facebook:&lt;fbToken&gt;
+
+     **google+**
+
+     Authorization: Basic googleplus:&lt;g+Token&gt;
+
+   3. After this the client can start to play on the world by creating a new Player on the world by invoking `POST /players/self`
+
+host: "192.168.43.57:8999"
+basePath: /XYRALITY/WebObjects/HKWorldServer.woa/rs
+schemes: [https]
+consumes:
+ - application/json
+produces:
+ - application/json
+securityDefinitions:
+ sessionAuth:
+   type: basic
+   description: |
+     HTTP Basic authentication for world server actions. It expects the base 64
+     encoded loginid and password.
+
+     base64(loginid:sessionToken)
+ credentialsAuth:
+   type: basic
+   description: "HTTP Basic authentication for accessing **Login Server** resources and retrieving **World Server** access tokens.\n\nIt expects the base 64 encoded username and password.\nDepending on the account type different values are expected for the Basic authentication username and password \n\n**anonymous**\n\ndeviceid:&lt;deviceid&gt;\n\n**email**\n\n&lt;email&gt;:&lt;passwordHash&gt;\n\n**facebook**\n\nfacebook:&lt;fbToken&gt;\n\n**google+**\n\ngoogleplus:&lt;g+Token&gt;\n"
+paths:
+
+ /login/account:
+   post:
+     description: | 
+       Creates a new account.
+
+       When logging into the game for the first time users will create an anonymous account by posting their device id to this resource.
+
+       After this users can switch to another authentication method.
+
+     operationId: createAccount
+     parameters:
+       - name: deviceId
+         in: query
+         type: string
+         description: the Id of the mobile device. On iOS devices this is the identifierForVendor
+         required: true
+     responses:
+       '201':
+         description: Account was successfully created
+         schema: { $ref: '#/definitions/AccountDTO' }
+       '400': { $ref: '#/responses/BadRequest' }
+       '409':
+         description: An account with the given credentials already exists
+         schema: { $ref: '#/definitions/ErrorMessageDTO' }
+
+ /login/account/credentials:
+   post:
+     description: switch account credentials
+     security: 
+       - credentialsAuth: []
+     parameters:
+       - name: facebook
+         in: query
+         type: string
+         description: facebook access token
+         default: ""
+       - name: googleplus
+         in: query
+         type: string
+         description: gplus access token
+         default: ""
+       - name: email
+         in: query
+         description: the email for which the account needs to be created
+         type: string
+         default: ""
+       - name: password
+         in: query
+         description: sha256 hash of the users password
+         type: string
+         default: ""
+     responses:
+       '204':
+         description: Switched credentials. No content in response body
+       '400': { $ref: '#/responses/BadRequest' }
+       '401': { $ref: '#/responses/NotAuthorized' }
+       '409':
+         description: The credentials submitted are already being used by another account
+         schema: { $ref: '#/definitions/ErrorMessageDTO' }
+
+ /token:
+   post:
+     description: This resource allows to retrieve access tokens for the HK World Server api
+     security: 
+       - credentialsAuth: []
+     operationId: retrieveToken
+     responses:
+       '201':
+         description: Token was successfully generated
+         schema:
+           $ref: '#/definitions/TokenDTO'
+       '400': { $ref: '#/responses/BadRequest' }
+       '401': { $ref: '#/responses/NotAuthorized' }
+
+ /players/self:
+   post:
+     description: |
+       Creates a new player on the world.
+       Note: This can only be done once per Login.
+     operationId: createPlayer
+     security:
+       - sessionAuth: []
+     parameters:
+       - name: nick
+         in: query
+         description: the nickname of the new player
+         type: string
+         minLength: 3
+         maxLength: 30
+         required: true
+     responses:
+       '201':
+         description: The newly created player
+         schema: { $ref: '#/definitions/PlayerDTO' }
+       '400': { $ref: '#/responses/BadRequest' }
+       '401': { $ref: '#/responses/NotAuthorized' }
+       '409':
+         description: The player is already playing on this world or the username was already taken. check the error message.
+         schema: { $ref: '#/definitions/ErrorMessageDTO' }
+   get:
+     description: Get logged in player
+     operationId: getSelf
+     security:
+       - sessionAuth: []
+     responses:
+       '200':
+         description: the player information
+         schema: { $ref: '#/definitions/PlayerDTO' }
+       '401': { $ref: '#/responses/NotAuthorized' }
+       '404': { $ref: '#/responses/NotFound' }
+   patch:
+     description: Update player that is logged in
+     operationId: patchSelf
+     security:
+       - sessionAuth: []
+     parameters:
+       - name: Player
+         required: true
+         in: body
+         description: a partial PlayerDTO containing the properties to change
+         schema: { $ref: '#/definitions/PlayerDTO' }
+     responses:
+       '200':
+         description: The player settings have been updated and the current player is returned.
+         schema: { $ref: '#/definitions/PlayerDTO' }
+       '401': { $ref: '#/responses/NotAuthorized' }
+       '404': { $ref: '#/responses/NotFound' }
+
+definitions:
+ ErrorMessageDTO:
+   properties:
+     httpStatus:
+       type: integer
+       readOnly: true
+       description: The http status code
+     errorCode:
+       type: integer
+       readOnly: true
+       description: the error code used internally
+     message:
+       type: string
+       readOnly: true
+       description: A description of the error that has occoured
+     localizedMessage:
+       type: string
+       readOnly: true
+       description: The localized version of the error message
+ AccountDTO:
+   properties:
+     id:
+       type: integer
+       readOnly: true
+       description: the id of the created account
+ TokenDTO:
+   properties:
+     token:
+       type: string
+ PlayerDTO:
+   properties:
+     id:
+       type: integer
+       readOnly: true
+       description: the player id
+     nick:
+       type: string
+       description: the player nickname
+       minLength: 3
+       maxLength: 30
+     points:
+       type: integer
+       readOnly: true
+       description: the current player points
+
+responses:
+ NotFound:
+   description: Not found
+   schema:
+     $ref: '#/definitions/ErrorMessageDTO'
+ BadRequest:
+   description: Parameters where missing or invalid
+   schema:
+     $ref: '#/definitions/ErrorMessageDTO'
+ NotAuthorized:
+   description: Not authorized
+   schema:
+     $ref: '#/definitions/ErrorMessageDTO'
