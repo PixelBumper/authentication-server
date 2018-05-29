@@ -6,7 +6,9 @@ import com.microb.auth.model.entities.Account
 import com.microb.auth.model.repositories.AccountRepository
 import com.microb.auth.services.AccountService
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.media.Schema
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
@@ -26,6 +29,10 @@ import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.SecurityContext
 
+// security scheme name
+const val JWT_SCHEME="jwt"
+
+// paths
 const val ACCOUNT_RESOURCE_BASE_PATH = "/accounts"
 const val EMAIL_ACCOUNT_CREATION_PATH = "/create-account-for-email-and-password"
 const val FULL_EMAIL_ACCOUNT_CREATION_PATH = "$ACCOUNT_RESOURCE_BASE_PATH$EMAIL_ACCOUNT_CREATION_PATH"
@@ -35,15 +42,23 @@ const val FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES = "$ACCOUNT_RESOURCE_BASE_P
 @Path(ACCOUNT_RESOURCE_BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 @Component
-@OpenAPIDefinition(info = Info(title = "wapow"))
-@SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic")
+@OpenAPIDefinition(
+        info = Info(title = "Authentication-Service")
+)
+@SecurityScheme(
+        name = JWT_SCHEME,
+        type = SecuritySchemeType.APIKEY,
+        `in` = SecuritySchemeIn.COOKIE)
+@Tag(
+        name = "AccountApi",
+        description = "With the operations defined in the AccountApi you can create, manage and delete accounts")
 class AccountApi @Autowired constructor(
         val accountRepository: AccountRepository,
         val accountService: AccountService) {
 
     @GET
     @Transactional
-    @SecurityRequirement(name = "basicAuth")
+    @SecurityRequirement(name = JWT_SCHEME)
     @PreAuthorize("hasRole('USER')")
     fun getAccounts(
             @Parameter(hidden = true)
@@ -61,6 +76,7 @@ class AccountApi @Autowired constructor(
     @Path(EMAIL_ACCOUNT_CREATION_PATH)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Transactional
+    @Operation(summary = "Create a new account for the given email and password")
     fun createEmailAccount(
             @Parameter(schema = Schema(
                     type = "string",
@@ -90,6 +106,7 @@ class AccountApi @Autowired constructor(
     @Path(ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @ApiResponse(responseCode = "200")
+    @Operation(summary = "Create a new account for the given iOS vendor id")
     fun createAccountForIOSDevice(
             @NotBlank(message = "you need to provide a vendor id")
             @FormParam("vendorId")
@@ -110,6 +127,8 @@ class AccountApi @Autowired constructor(
     @GET
     @Path("self")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @SecurityRequirement(name = JWT_SCHEME)
+    @Operation(summary = "returns the account of the user associated with the jwt used to authenticate")
     fun getAccountInfo(
             @Context
             securityContext: SecurityContext

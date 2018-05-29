@@ -2,8 +2,10 @@ package com.microb.auth.jersey.api
 
 import com.microb.auth.services.EXPIRATION_TIME
 import com.microb.auth.services.JWTService
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.security.SecurityScheme
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
@@ -19,7 +21,7 @@ const val CREATE_TOKEN_PATH = "$TOKENS_RESOURCE_BASE$TOKEN_CREATION"
 @Path(TOKENS_RESOURCE_BASE)
 @Produces(MediaType.APPLICATION_JSON)
 @Component
-@SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic")
+@Tag(name = "TokenApi", description = "can be used to create access tokens")
 class TokenApi(
         private val JWTService: JWTService) {
 
@@ -27,6 +29,7 @@ class TokenApi(
     @Path(TOKEN_CREATION)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @POST
+    @Operation(summary = "Creates a JWT token and returns it in a cookie")
     fun createToken(
             @NotBlank(message = "")
             @FormParam("username")
