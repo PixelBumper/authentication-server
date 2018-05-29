@@ -48,7 +48,7 @@ class TokenApi(
                         "0.0.0.0",
                         "JWT Token",
                         (EXPIRATION_TIME / 1000).toInt(),
-                        false,
+                        true,
                         true)
                 ).build()
     }
