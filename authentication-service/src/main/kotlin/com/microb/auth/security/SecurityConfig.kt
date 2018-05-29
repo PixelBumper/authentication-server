@@ -26,10 +26,10 @@ class SecurityConfig(
 
     override fun configure(http: HttpSecurity) {
         http
-                .csrf().disable()
+                .csrf()
                 // ensure that the CSFR cookies are accessible by JS
-//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                .and()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .and()
                 // ensure that Spring Security will never create an HttpSession and it will never use it to obtain the SecurityContext
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
