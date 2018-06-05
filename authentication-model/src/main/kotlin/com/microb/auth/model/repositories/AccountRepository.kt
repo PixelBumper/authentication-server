@@ -6,7 +6,7 @@ import java.util.*
 interface AccountRepository : BaseRepository<Account, UUID> {
 
     @JvmDefault
-    fun findById(uuid:String): Account?{
+    fun findById(uuid: String): Account? {
         return try {
             findById(UUID.fromString(uuid)).orElse(null)
         } catch (e: IllegalArgumentException) {

@@ -2,7 +2,6 @@ package com.microb.auth.jersey.api
 
 import com.microb.auth.jersey.dtos.AccountDTO
 import com.microb.auth.jersey.dtos.assembleDto
-import com.microb.auth.model.entities.Account
 import com.microb.auth.model.repositories.AccountRepository
 import com.microb.auth.services.AccountService
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -22,7 +20,10 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
 import java.security.Principal
 import javax.transaction.Transactional
-import javax.validation.constraints.*
+import javax.validation.constraints.Email
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
+import javax.validation.constraints.NotBlank
 import javax.ws.rs.*
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Context
@@ -30,7 +31,7 @@ import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.SecurityContext
 
 // security scheme name
-const val JWT_SCHEME="jwt"
+const val JWT_SCHEME = "jwt"
 
 // paths
 const val ACCOUNT_RESOURCE_BASE_PATH = "/accounts"
@@ -137,7 +138,6 @@ class AccountApi @Autowired constructor(
                 .getAccountOfSecurityContext(securityContext)
                 .assembleDto()
     }
-
 
 
 }

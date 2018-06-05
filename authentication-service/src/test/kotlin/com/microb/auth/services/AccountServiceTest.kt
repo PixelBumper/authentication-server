@@ -14,15 +14,15 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.mockito.AdditionalAnswers.returnsFirstArg
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
-import org.springframework.transaction.support.TransactionTemplate
-import org.junit.rules.ExpectedException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.transaction.support.TransactionTemplate
 import java.security.Principal
 import javax.ws.rs.NotAuthorizedException
 import javax.ws.rs.core.SecurityContext
@@ -62,7 +62,7 @@ class AccountServiceTest {
     lateinit var accountService: AccountService
 
     @Before
-    fun setUp(){
+    fun setUp() {
         accountService = AccountService(
                 accountRepository,
                 emailCredentialRepository,
@@ -92,7 +92,7 @@ class AccountServiceTest {
     }
 
     @Test
-    fun `ensure that a ConflictException is thrown when there is already an account associated with the given email`(){
+    fun `ensure that a ConflictException is thrown when there is already an account associated with the given email`() {
         doReturn(mock(CredentialPassword::class.java)).`when`(emailCredentialRepository).findByEmail(EMAIL)
 
         exception.expect(ConflictException::class.java)
@@ -101,7 +101,7 @@ class AccountServiceTest {
     }
 
     @Test
-    fun `ensure that a ConflictException is thrown when the unique constraint on the email field fails`(){
+    fun `ensure that a ConflictException is thrown when the unique constraint on the email field fails`() {
         doReturn(HASHED_PASSWORD).`when`(passwordService).hash(PASSWORD)
 
         // simulate unique constraint violation
@@ -133,7 +133,7 @@ class AccountServiceTest {
     }
 
     @Test
-    fun `ensure that a ConflictException is thrown when there is already an account associated with the given device`(){
+    fun `ensure that a ConflictException is thrown when there is already an account associated with the given device`() {
 
         doReturn(listOf(mock(CredentialIOSDevice::class.java)))
                 .`when`(credentialIOSDeviceRepository)
@@ -145,7 +145,7 @@ class AccountServiceTest {
     }
 
     @Test
-    fun `ensure that a ConflictException is thrown when the deviceId unique constraint fails`(){
+    fun `ensure that a ConflictException is thrown when the deviceId unique constraint fails`() {
         // simulate unique constraint violation
         val integrityViolationException = mock(DataIntegrityViolationException::class.java)
         doThrow(integrityViolationException).`when`(accountRepository).save(ArgumentMatchers.any())
@@ -158,14 +158,15 @@ class AccountServiceTest {
     }
 
     // this little hack is necessary since mockitos eq will return null and therefore cause kotlin to throw an IllegalStateException at runtime
-    private fun <T> eq(value:T): T {
+    private fun <T> eq(value: T): T {
         ArgumentMatchers.eq<T>(value)
         return uninitialized()
     }
+
     private fun <T> uninitialized(): T = null as T
 
     @Test
-    fun `ensure the account is retrieved from the security context`(){
+    fun `ensure the account is retrieved from the security context`() {
         val account = Account()
 
         doReturn(account).`when`(accountRepository).findById(eq(account.name))
@@ -218,7 +219,7 @@ class AccountServiceTest {
     }
 
     @Test
-    fun `ensure that a RuntimeException is thrown when trying to get an account for a principal that has no account`(){
+    fun `ensure that a RuntimeException is thrown when trying to get an account for a principal that has no account`() {
         val principal = mock(Principal::class.java)
         doReturn("some accountId").`when`(principal).name
 

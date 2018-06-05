@@ -3,8 +3,6 @@ package com.microb.auth.jersey.api
 import com.microb.auth.services.EXPIRATION_TIME
 import com.microb.auth.services.JWTService
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
-import io.swagger.v3.oas.annotations.security.SecurityScheme
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotBlank

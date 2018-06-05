@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication
  *
  * Usually this is where entities are retrieved from the database when needed
  */
-class JWTAuthenticationProvider: AuthenticationProvider {
+class JWTAuthenticationProvider : AuthenticationProvider {
     override fun authenticate(authentication: Authentication): Authentication {
         return authentication
     }

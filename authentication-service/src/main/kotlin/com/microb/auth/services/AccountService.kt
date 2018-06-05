@@ -93,10 +93,11 @@ class AccountService(
 
     @Transactional
     fun getAccountOfSecurityContext(securityContext: SecurityContext): Account {
-        val userPrincipal = securityContext.userPrincipal ?: throw NotAuthorizedException(THERE_WAS_NO_PRINCIPAL_SET_IN_THE_SECURITY_CONTEXT)
+        val userPrincipal = securityContext.userPrincipal
+                ?: throw NotAuthorizedException(THERE_WAS_NO_PRINCIPAL_SET_IN_THE_SECURITY_CONTEXT)
 
         val accountId = userPrincipal.name
-        if (accountId.isNullOrBlank()){
+        if (accountId.isNullOrBlank()) {
             throw NotAuthorizedException(THE_PRINCIPAL_DID_NOT_HAVE_A_NON_BLANK_NAME)
         }
 

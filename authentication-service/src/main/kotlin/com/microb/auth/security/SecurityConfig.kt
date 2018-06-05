@@ -5,7 +5,6 @@ import com.microb.auth.jersey.api.CREATE_TOKEN_PATH
 import com.microb.auth.jersey.api.FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES
 import com.microb.auth.jersey.api.FULL_EMAIL_ACCOUNT_CREATION_PATH
 import com.microb.auth.services.JWTService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder

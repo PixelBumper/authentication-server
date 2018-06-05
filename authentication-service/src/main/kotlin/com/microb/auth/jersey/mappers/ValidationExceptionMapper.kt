@@ -10,7 +10,7 @@ import javax.ws.rs.ext.Provider
 
 @Provider
 @Component
-class ValidationExceptionMapper: ExceptionMapper<ValidationException> {
+class ValidationExceptionMapper : ExceptionMapper<ValidationException> {
     override fun toResponse(exception: ValidationException?): Response {
         return if (exception is ConstraintViolationException) {
             val message = exception.constraintViolations.joinToString("\n") { it.message }
