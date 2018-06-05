@@ -25,6 +25,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.transaction.support.TransactionTemplate
 import java.security.Principal
 import javax.ws.rs.NotAuthorizedException
+import javax.ws.rs.NotFoundException
 import javax.ws.rs.core.SecurityContext
 
 
@@ -219,17 +220,32 @@ class AccountServiceTest {
     }
 
     @Test
-    fun `ensure that a RuntimeException is thrown when trying to get an account for a principal that has no account`() {
+    fun `ensure that a NotFoundException is thrown when trying to get an account for a principal that has no account`() {
         val principal = mock(Principal::class.java)
         doReturn("some accountId").`when`(principal).name
 
         val securityContext = mock(SecurityContext::class.java)
         doReturn(principal).`when`(securityContext).userPrincipal
 
-        exception.expect(RuntimeException::class.java)
+        exception.expect(NotFoundException::class.java)
         exception.expectMessage(THERE_WAS_NO_ACCOUNT_FOR_ACCOUNT_ID)
 
         accountService.getAccountOfSecurityContext(securityContext)
+    }
+
+    @Test
+    fun `ensure account deletion works as expected`() {
+        val account = Account()
+
+        doReturn(account).`when`(accountRepository).findById(eq(account.name))
+
+        val securityContext = mock(SecurityContext::class.java)
+
+        doReturn(account).`when`(securityContext).userPrincipal
+
+        accountService.deleteAccount(securityContext)
+
+        verify(accountRepository).delete(account)
     }
 
 }

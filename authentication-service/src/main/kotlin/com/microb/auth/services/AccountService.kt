@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import javax.ws.rs.NotFoundException
 import javax.ws.rs.core.SecurityContext
 
 const val EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT = "there is already an account associated with this email"
@@ -102,7 +103,11 @@ class AccountService(
         }
 
         return accountRepository.findById(accountId)
-                ?: throw RuntimeException("$THERE_WAS_NO_ACCOUNT_FOR_ACCOUNT_ID'$accountId'")
+                ?: throw NotFoundException("$THERE_WAS_NO_ACCOUNT_FOR_ACCOUNT_ID'$accountId'")
+    }
+
+    fun deleteAccount(securityContext: SecurityContext) {
+        accountRepository.delete(getAccountOfSecurityContext(securityContext))
     }
 
 }

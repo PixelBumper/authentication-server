@@ -139,5 +139,16 @@ class AccountApi @Autowired constructor(
                 .assembleDto()
     }
 
+    @DELETE
+    @Path("self")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @SecurityRequirement(name = JWT_SCHEME)
+    @Operation(summary = "deletes the account of the user associated with the jwt used to authenticate")
+    fun deleteAccount(
+            @Context
+            securityContext: SecurityContext
+    ) {
+        accountService.deleteAccount(securityContext)
+    }
 
 }
