@@ -12,29 +12,33 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 compileKotlin {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict", '-Xenable-jvm-default']
+        freeCompilerArgs = ["-Xjsr305=strict", '-Xjvm-default=compatibility']
         jvmTarget = "1.8"
     }
 }
 compileTestKotlin {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict", '-Xenable-jvm-default']
+        freeCompilerArgs = ["-Xjsr305=strict", '-Xjvm-default=compatibility']
         jvmTarget = "1.8"
     }
 }
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.spring.io/snapshot" }
-    maven { url "https://repo.spring.io/milestone" }
+    maven {
+        url "https://repo.spring.io/snapshot"
+    }
+    maven {
+        url "https://repo.spring.io/milestone"
+    }
 }
 
 dependencies {
     // kotlin TODO investigate why we have to force the dependency here
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"){
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion") {
         force = true
     }
-    compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"){
+    compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion") {
         force = true
     }
     compile("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
@@ -58,6 +62,8 @@ sourceSets {
 
 // ensure spring dependency resolution works in this submodule, as the 'org.springframework.boot' plugin is not applied here
 dependencyManagement {
-    imports { mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}") }
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+    }
 }
 

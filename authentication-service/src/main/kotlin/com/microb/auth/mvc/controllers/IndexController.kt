@@ -10,7 +10,7 @@ private const val PATH = "/error"
 @RestController
 class IndexController : ErrorController {
 
-    @RequestMapping(value = PATH)
+    @RequestMapping(value = [PATH])
     fun error(): String {
         return "Error handling"
     }

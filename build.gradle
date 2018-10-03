@@ -1,15 +1,19 @@
 buildscript {
     ext {
         sourceCompatibilityVersion = '1.8'
-        kotlinVersion = '1.2.41'
+        kotlinVersion = '1.2.71'
         springBootVersion = '2.0.1.RELEASE'
-        swaggerVersion = '2.0.0'
+        swaggerVersion = '2.0.2'
         queryDslVersion = '4.1.3'
     }
     repositories {
         mavenCentral()
-        maven { url "https://repo.spring.io/snapshot" }
-        maven { url "https://repo.spring.io/milestone" }
+        maven {
+            url "https://repo.spring.io/snapshot"
+        }
+        maven {
+            url "https://repo.spring.io/milestone"
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
