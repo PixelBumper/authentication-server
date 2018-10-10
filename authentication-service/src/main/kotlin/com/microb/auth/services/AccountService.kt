@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.Instant
 import javax.ws.rs.NotFoundException
 import javax.ws.rs.core.SecurityContext
 
@@ -49,12 +50,14 @@ class AccountService(
     private fun createAccountForEmailInternal(email: String, password: String): Account {
         emailCredentialRepository.findByEmail(email)?.let { throw ConflictException(EMAIL_IS_ALREADY_LINKED_TO_ANOTHER_ACCOUNT) }
 
-        val account = Account()
+        val now = Instant.now()
+        val account = Account(now)
 
         val credential: Credential = CredentialPassword(
                 account = account,
                 email = email,
-                password = passwordService.hash(password))
+                password = passwordService.hash(password),
+                now = now)
 
         account.credentials.add(credential)
 
@@ -79,12 +82,14 @@ class AccountService(
         val credentialIOSDevice = QCredentialIOSDevice.credentialIOSDevice
         credentialIOSDeviceRepository.findAll(credentialIOSDevice.vendorId.eq(vendorId)).any { throw ConflictException(DEVICE_ID_ALREADY_LINKED_TO_ANOTHER_ACCOUNT) }
 
-        val account = Account()
+        val now = Instant.now()
+        val account = Account(now)
 
         val vendorIdCredential = CredentialIOSDevice(
                 account = account,
                 vendorId = vendorId,
-                deviceName = deviceName)
+                deviceName = deviceName,
+                now = now)
 
         account.credentials.add(vendorIdCredential)
 

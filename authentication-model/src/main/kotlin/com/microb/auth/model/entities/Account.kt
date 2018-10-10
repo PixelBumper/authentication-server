@@ -1,18 +1,28 @@
 package com.microb.auth.model.entities
 
+import com.microb.auth.hibernate.InstantAttributeConverter
 import java.security.Principal
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.OneToMany
+import java.time.Instant
+import javax.persistence.*
 
 @Entity
 class Account(
-        @OneToMany(
-                mappedBy = "account",
-                cascade = [CascadeType.ALL],
-                targetEntity = Credential::class)
-        var credentials: MutableList<Credential> = mutableListOf()
+        creationDate: Instant,
+        credentials: MutableList<Credential> = mutableListOf()
 ) : BaseEntity(), Principal {
+
+    @Column(
+            nullable = false,
+            updatable = false)
+    @Convert(converter = InstantAttributeConverter::class)
+    var creationDate: Instant = creationDate
+        internal set
+
+    @OneToMany(
+            mappedBy = "account",
+            cascade = [CascadeType.ALL],
+            targetEntity = Credential::class)
+    var credentials = credentials
 
     override fun getName(): String = "$id"
 }

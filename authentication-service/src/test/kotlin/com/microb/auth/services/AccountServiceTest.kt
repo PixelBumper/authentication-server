@@ -24,6 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.transaction.support.TransactionTemplate
 import java.security.Principal
+import java.time.Instant
 import javax.ws.rs.NotAuthorizedException
 import javax.ws.rs.NotFoundException
 import javax.ws.rs.core.SecurityContext
@@ -169,7 +170,7 @@ class AccountServiceTest {
 
     @Test
     fun `ensure the account is retrieved from the security context`() {
-        val account = Account()
+        val account = Account(creationDate = Instant.now())
 
         doReturn(account).`when`(accountRepository).findById(eq(account.name))
 
@@ -236,7 +237,7 @@ class AccountServiceTest {
 
     @Test
     fun `ensure account deletion works as expected`() {
-        val account = Account()
+        val account = Account(Instant.now())
 
         doReturn(account).`when`(accountRepository).findById(eq(account.name))
 
