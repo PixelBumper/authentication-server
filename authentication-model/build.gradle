@@ -50,8 +50,10 @@ dependencies {
     // TODO figure out why 'api' cannot be used instead of compile
     compile "com.querydsl:querydsl-jpa:$queryDslVersion"
     kapt "com.querydsl:querydsl-apt:$queryDslVersion:jpa"
+
+    implementation group: 'com.h2database', name: 'h2', version: '1.4.194'
     
-    implementation('org.liquibase:liquibase-core')
+//    implementation('org.liquibase:liquibase-core')
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }

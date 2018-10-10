@@ -28,6 +28,9 @@ class SecurityConfig(
                 .csrf()
                 // ensure that the CSFR cookies are accessible by JS
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringAntMatchers("/h2-console/**")
+                .and()
+                .headers().frameOptions().disable()
                 .and()
                 // ensure that Spring Security will never create an HttpSession and it will never use it to obtain the SecurityContext
                 .sessionManagement()
@@ -39,10 +42,12 @@ class SecurityConfig(
                         "/*.js",
                         "/*.css",
                         "/*.png",
+                        "/h2-console/**",
                         "$JERSEY_BASE_PATH/openapi.json",
                         "$JERSEY_BASE_PATH/$FULL_EMAIL_ACCOUNT_CREATION_PATH",
                         "$JERSEY_BASE_PATH/$FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES",
-                        "$JERSEY_BASE_PATH/$CREATE_TOKEN_PATH").permitAll()
+                        "$JERSEY_BASE_PATH/$CREATE_TOKEN_PATH")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(JWTAuthenticationFilter(jwtService), BasicAuthenticationFilter::class.java)
