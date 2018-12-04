@@ -76,3 +76,7 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 
+bootJar {
+    mainClassName = 'com.microb.auth.AuthenticationServiceApplicationKt'
+}
+

@@ -3,7 +3,6 @@ package com.microb.auth
 import com.sun.tools.attach.VirtualMachine
 import org.aspectj.weaver.loadtime.Agent
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.AdviceMode
@@ -60,7 +59,6 @@ fun main(args: Array<String>) {
     runApplication<AuthenticationServiceApplication>(*args)
 }
 
-@EnableAutoConfiguration
 @SpringBootApplication
 @EnableSpringConfigured
 @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
