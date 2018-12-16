@@ -44,6 +44,8 @@ dependencies {
     // project dependencies
     implementation project(":authentication-model")
 
+    implementation('org.liquibase:liquibase-core')
+
     // kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
@@ -60,6 +62,9 @@ dependencies {
     implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
 
     implementation group: 'com.h2database', name: 'h2', version: '1.4.194'
+
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 
     // JWT
     implementation group: 'com.auth0', name: 'java-jwt', version: '3.3.0'

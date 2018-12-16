@@ -1,0 +1,7 @@
+// generate changelog.xml from postgres
+liquibase --driver=org.postgresql.Driver --url="jdbc:postgresql://localhost:5432/authentication_service"  --classpath=postgresql-42.2.5.jar --changeLogFile=./changelog_pg.xml --username=postgres --password=password generateChangeLog
+
+// generate changelog.xml from embedded h2
+liquibase --driver=org.h2.Driver --url="jdbc:h2:tcp://localhost:9092/mem:test;DB_CLOSE_ON_EXIT=FALSE"  --classpath=h2-1.4.194.jar --changeLogFile=./changelog.xml --username=test --password=test generateChangeLog
+
+
