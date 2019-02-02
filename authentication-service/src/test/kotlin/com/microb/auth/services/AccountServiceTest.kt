@@ -59,17 +59,22 @@ class AccountServiceTest {
     lateinit var passwordService: PasswordService
 
     @Mock
+    lateinit var timeService: TimeService
+
+    @Mock
     lateinit var transactionTemplate: TransactionTemplate
 
     lateinit var accountService: AccountService
 
     @Before
     fun setUp() {
+        doReturn(Instant.now()).`when`(timeService).getCurrentTime()
         accountService = AccountService(
                 accountRepository,
                 emailCredentialRepository,
                 credentialIOSDeviceRepository,
                 passwordService,
+                timeService,
                 transactionTemplate)
     }
 
