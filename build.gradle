@@ -1,7 +1,7 @@
 buildscript {
     ext {
         sourceCompatibilityVersion = '1.8'
-        kotlinVersion = '1.2.71'
+        kotlinVersion = '1.3.20'
         springBootVersion = '2.1.2.RELEASE'
         swaggerVersion = '2.0.6'
         queryDslVersion = '4.2.1'
