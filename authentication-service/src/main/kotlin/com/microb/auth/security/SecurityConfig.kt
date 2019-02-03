@@ -1,6 +1,6 @@
 package com.microb.auth.security
 
-import com.microb.auth.JERSEY_BASE_PATH
+import com.microb.auth.jersey.JERSEY_BASE_PATH
 import com.microb.auth.jersey.api.CREATE_TOKEN_PATH
 import com.microb.auth.jersey.api.FULL_ACCOUNT_CREATION_PATH_FOR_IOS_DEVICES
 import com.microb.auth.jersey.api.FULL_EMAIL_ACCOUNT_CREATION_PATH

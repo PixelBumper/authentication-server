@@ -1,10 +1,6 @@
-package com.microb.auth
+package com.microb.auth.jersey
 
-import com.microb.auth.jersey.api.AccountApi
-import com.microb.auth.jersey.api.TokenApi
-import com.microb.auth.jersey.mappers.AllExceptionMapper
 import com.microb.auth.jersey.mappers.ValidationExceptionMapper
-import com.microb.auth.jersey.mappers.WebApplicationExceptionMapper
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource
 import org.glassfish.hk2.utilities.binding.AbstractBinder
 import org.glassfish.jersey.jackson.JacksonFeature
@@ -47,9 +43,9 @@ class JerseyConfig : ResourceConfig() {
 
         // ensure non 200 responses are nor redirected to an error page
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true)
+
         // disable moxy
         property(ServerProperties.MOXY_JSON_FEATURE_DISABLE, true)
-//        property(ServerProperties.TRACING, TracingConfig.ALL.name)
 
         // Register JacksonFeature.
         register(JacksonFeature::class.java)
@@ -61,13 +57,7 @@ class JerseyConfig : ResourceConfig() {
     }
 
     private final fun registerEndpoints() {
-
-        register(TokenApi::class.java)
-        register(AccountApi::class.java)
-        register(AllExceptionMapper::class.java)
-        register(WebApplicationExceptionMapper::class.java)
-
-
+        packages(this.javaClass.`package`.name)
     }
 
 
