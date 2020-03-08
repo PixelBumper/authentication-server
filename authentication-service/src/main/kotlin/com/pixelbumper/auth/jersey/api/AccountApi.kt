@@ -20,10 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Component
 import java.security.Principal
 import javax.transaction.Transactional
-import javax.validation.constraints.Email
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotBlank
+import javax.validation.constraints.*
 import javax.ws.rs.*
 import javax.ws.rs.container.ContainerRequestContext
 import javax.ws.rs.core.Context
@@ -81,19 +78,19 @@ class AccountApi @Autowired constructor(
     fun createEmailAccount(
             @Parameter(schema = Schema(
                     type = "string",
-                    format = "email"))
+                    format = "email",
+                    maxLength = 256))
             @NotBlank(message = "you need to provide a valid email address")
             @Email
             @FormParam("email")
-            @Max(254, message = "the email address was too long")
+            @Size(max=256, message = "the email address was too long")
             email: String,
 
             @Parameter(schema = Schema(
                     type = "string",
                     format = "password"))
             @NotBlank(message = "you need to provide a password")
-            @Min(8, message = "the password was too short")
-            @Max(256, message = "the password was too long")
+            @Size(min = 8, max= 256, message = "the password must be between 8 and 256 characters long")
             @FormParam("password")
             password: String
     ): AccountDTO? {
